@@ -32,6 +32,8 @@ public class UserModel implements Serializable{
 
     private String password;
 
+    private String bio;
+    private String urlPhoto;
 
     @ManyToMany( cascade = CascadeType.ALL,fetch = FetchType.EAGER)
     @JoinTable(
@@ -45,11 +47,34 @@ public class UserModel implements Serializable{
     @ManyToMany
     @JoinTable(
             name = "tb_users_posts",
-            joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id")
     )
     private Set<PostModel> posts;
 
+
+    public String getBio() {
+        return bio;
+    }
+
+    public void setBio(String bio) {
+        this.bio = bio;
+    }
+
+    public String getUrlPhoto() {
+        return urlPhoto;
+    }
+
+    public void setUrlPhoto(String urlPhoto) {
+        this.urlPhoto = urlPhoto;
+    }
+
+    public Set<PostModel> getPosts() {
+        return posts;
+    }
+
+    public void setPosts(Set<PostModel> posts) {
+        this.posts = posts;
+    }
 
     public UUID getId() {
         return id;
@@ -66,7 +91,6 @@ public class UserModel implements Serializable{
     public void setUsername(String username) {
         this.username = username;
     }
-
 
 
     public String getPassword() {

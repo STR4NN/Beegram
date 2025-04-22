@@ -12,22 +12,33 @@ public class PostModel {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(length = 500)
     private String conteudo;
 
     @CreationTimestamp
     private Instant horarioDoPost;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    private UserModel user;
+//    @ManyToOne
+//    @JoinColumn(name = "user_id")
+//    private UserModel user;
 
-    public UserModel getUser() {
-        return user;
+    private String userUsername;
+
+    public String getUserUsername() {
+        return userUsername;
     }
 
-    public void setUser(UserModel user) {
-        this.user = user;
+    public void setUserUsername(String userUsername) {
+        this.userUsername = userUsername;
     }
+
+//    public UserModel getUser() {
+//        return user;
+//    }
+//
+//    public void setUser(UserModel user) {
+//        this.user = user;
+//    }
 
     public Long getId() {
         return id;

@@ -13,6 +13,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.List;
 import java.util.Set;
 
 @Service
@@ -55,6 +56,11 @@ public class UserService {
 
         return ResponseEntity.ok().build();
     }
+    public ResponseEntity<List<UserModel>> listUsers(){
+        var users = userRepository.findAll();
+        return ResponseEntity.ok(users);
+    }
+
     @Transactional
     public ResponseEntity<Void> deleteUserByUsername(String username){
           var user = userRepository.findByUsername(username);

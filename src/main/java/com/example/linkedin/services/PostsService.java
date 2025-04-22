@@ -9,13 +9,15 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
+
+import java.util.UUID;
 
 @Service
 public class PostsService {
 
-    @PersistenceContext // Serve para injetar uma instancia do EntityManager
-    EntityManager entityManager;
 
     @Autowired
     UserRepository userRepository;
@@ -23,24 +25,18 @@ public class PostsService {
     @Autowired
     PostRepository postRepository;
 
-    public ResponseEntity<PostModel> createPosts(PostsDTO dto) {
-
-
-        if(dto.user_id() == null){
-            throw new RuntimeException("Id invalido, ou não existente");
-        }
-
-        UserModel userModel = entityManager.find(UserModel.class, dto.user_id());
-
-        if(userModel == null){
-            throw  new RuntimeException("Usuario não encontrado");
-        }
+    public ResponseEntity<PostModel> createPosts(PostsDTO dto,
+                                                 @AuthenticationPrincipal Jwt jwt) {
+      UUID userId = UUID.fromString(jwt.getSubject());
+      var user = userRepository.findById(userId).orElseThrow
+              (() -> new RuntimeException("Usuario não encontrado"));
 
         PostModel post = new PostModel();
         post.setConteudo(dto.conteudo());
-        post.setUser(userModel);
+        post.setUserUsername(user.getUsername());
 
-        entityManager.persist(post); // Persist == Save
+        postRepository.save(post);
+        // Persist == Save
         return ResponseEntity.ok(post);
     }
 

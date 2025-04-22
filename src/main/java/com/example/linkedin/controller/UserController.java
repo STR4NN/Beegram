@@ -49,8 +49,10 @@ public class UserController {
 
     @DeleteMapping("/delete/{username}")
     @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
-    public ResponseEntity<Void> deleteUser(@PathVariable String username){
+    public ResponseEntity<List<UserModel>> deleteUser(@PathVariable String username){
         userService.deleteUserByUsername(username);
-        return ResponseEntity.ok().build();
+      var users = userRepository.findAll();
+      return ResponseEntity.ok(users);
+
     }
 }
