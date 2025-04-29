@@ -1,20 +1,18 @@
 package com.example.linkedin.controller;
 
-import com.example.linkedin.dto.CreateUserDTO;
-import com.example.linkedin.dto.LoginRequest;
-import com.example.linkedin.dto.LoginResponse;
+import com.example.linkedin.dto.*;
 import com.example.linkedin.model.UserModel;
 import com.example.linkedin.repository.UserRepository;
 import com.example.linkedin.services.TokenService;
 import com.example.linkedin.services.UserService;
-import jakarta.annotation.security.PermitAll;
-import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
-import java.awt.*;
+import javax.security.auth.login.CredentialException;
 import java.util.List;
 
 @RestController
@@ -53,6 +51,22 @@ public class UserController {
         userService.deleteUserByUsername(username);
       var users = userRepository.findAll();
       return ResponseEntity.ok(users);
+
+    }
+    @PostMapping("/profile/edit/{username}")
+    public ResponseEntity<Void> editProfile( @PathVariable String username,
+                                            @RequestBody EditProfileDTO dto,
+                                            @AuthenticationPrincipal Jwt jwt) throws CredentialException {
+        userService.editProfile(username, dto, jwt);
+        return ResponseEntity.ok().build();
+
+    }
+    @GetMapping("/profile/{username}")
+    public ResponseEntity<ShowProfileDTO> showProfile(@PathVariable String username,
+                                                      ShowProfileDTO dto,
+                                                      @AuthenticationPrincipal Jwt jwt) throws CredentialException {
+       return userService.showProfile(username, dto, jwt);
+
 
     }
 }

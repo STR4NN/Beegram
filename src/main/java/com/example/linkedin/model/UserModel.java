@@ -1,11 +1,13 @@
 package com.example.linkedin.model;
 
+import com.example.linkedin.dto.CreateUserDTO;
 import com.example.linkedin.dto.LoginRequest;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.processing.Pattern;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -20,7 +22,7 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "tb_users")
-public class UserModel implements Serializable{
+public class UserModel implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -32,25 +34,54 @@ public class UserModel implements Serializable{
 
     private String password;
 
+    @Column(length = 100)
     private String bio;
+
     private String urlPhoto;
 
-    @ManyToMany( cascade = CascadeType.ALL,fetch = FetchType.EAGER)
+    @ManyToMany
     @JoinTable(
-        name = "tb_users_roles",
-        joinColumns = @JoinColumn(name = "user_id"),
-        inverseJoinColumns =@JoinColumn (name ="role_id")
+            name = "user_following_tb",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "following_id")
+    )
+    private Set<UserModel> following;
+
+
+    @ManyToMany(mappedBy = "following")
+    private Set<UserModel> followers;
+
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "tb_users_roles",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id")
 
     )
     private Set<RoleModel> roles;
 
-    @ManyToMany
-    @JoinTable(
-            name = "tb_users_posts",
-            inverseJoinColumns = @JoinColumn(name = "role_id")
-    )
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private Set<PostModel> posts;
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private Set<CommentsModel> comentario;
+
+
+    public Set<UserModel> getFollowers() {
+        return followers;
+    }
+
+    public void setFollowers(Set<UserModel> followers) {
+        this.followers = followers;
+    }
+
+    public Set<UserModel> getFollowing() {
+        return following;
+    }
+
+    public void setFollowing(Set<UserModel> following) {
+        this.following = following;
+    }
 
     public String getBio() {
         return bio;
@@ -92,7 +123,6 @@ public class UserModel implements Serializable{
         this.username = username;
     }
 
-
     public String getPassword() {
         return password;
     }
@@ -108,9 +138,10 @@ public class UserModel implements Serializable{
     public void setRoles(Set<RoleModel> roles) {
         this.roles = roles;
     }
-    public boolean isLoginCorrect(LoginRequest loginRequest, PasswordEncoder passwordEncoder){
-       return passwordEncoder.matches(loginRequest.password(), this.password);
-    }
 
+    public boolean isLoginCorrect(LoginRequest loginRequest, PasswordEncoder passwordEncoder) {
+        return passwordEncoder.matches(loginRequest.password(), this.password);
+
+    }
 
 }
